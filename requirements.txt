@@ -1,0 +1,7 @@
+# This file is auto-generated from requirements.in
+# To update, edit requirements.in and run: make compile-requirements
+
+slack-bolt
+langchain
+langchain-google-genai
+python-dotenv

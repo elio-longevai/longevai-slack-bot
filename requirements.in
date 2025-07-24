@@ -1,0 +1,9 @@
+# Core Slack integration
+slack-bolt
+
+# LLM integration with Google Gemini via LangChain
+langchain
+langchain-google-genai
+
+# Environment variable management
+python-dotenv

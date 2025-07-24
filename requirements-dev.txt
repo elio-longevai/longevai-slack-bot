@@ -1,0 +1,4 @@
+# This file is auto-generated from requirements-dev.in
+# To update, edit requirements-dev.in and run: make compile-requirements
+
+ruff
