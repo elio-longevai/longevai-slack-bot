@@ -17,6 +17,7 @@ logging.basicConfig(level=logging.INFO)
 # Initialize the Slack Bolt App
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
+
 # --- Slack Event Listener ---
 @app.message()
 def handle_message(message: dict, say: callable):
@@ -24,11 +25,11 @@ def handle_message(message: dict, say: callable):
     This function is triggered by any new message in a channel the bot is in.
     It analyzes the message and replies selectively using the LLM.
     """
-    user_message = message.get('text', '')
-    channel_id = message.get('channel')
-    
+    user_message = message.get("text", "")
+    channel_id = message.get("channel")
+
     # Ignore messages from bots or without text
-    if message.get('bot_id') or not user_message:
+    if message.get("bot_id") or not user_message:
         return
 
     logging.info(f"Received message in channel {channel_id}: '{user_message}'")
@@ -41,6 +42,7 @@ def handle_message(message: dict, say: callable):
         logging.info(f"Sending reply: '{bot_reply}'")
         say(text=bot_reply)
 
+
 def start():
     """Starts the Slack bot using Socket Mode."""
     try:
@@ -49,7 +51,10 @@ def start():
         logging.info("🤖 Qualivita Assistant is running!")
         handler.start()
     except Exception as e:
-        logging.critical(f"🔴 CRITICAL ERROR: Could not start the bot. Check your tokens. Error: {e}")
+        logging.critical(
+            f"🔴 CRITICAL ERROR: Could not start the bot. Check your tokens. Error: {e}"
+        )
+
 
 if __name__ == "__main__":
     start()

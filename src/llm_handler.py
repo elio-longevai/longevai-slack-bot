@@ -30,6 +30,7 @@ You have two modes of operation:
 Analyze the following user message from Slack and provide your response based on these rules.
 """
 
+
 def get_llm_response(user_message: str) -> str | None:
     """
     Analyzes a user's message using the Gemini LLM and returns a response
@@ -49,14 +50,13 @@ def get_llm_response(user_message: str) -> str | None:
             temperature=0.7,
             max_tokens=None,
             timeout=None,
-            max_retries=2
+            max_retries=2,
         )
 
         # Create the prompt template
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", SYSTEM_PROMPT),
-            ("user", "{input}")
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [("system", SYSTEM_PROMPT), ("user", "{input}")]
+        )
 
         # Create the chain
         chain = prompt | llm | StrOutputParser()
