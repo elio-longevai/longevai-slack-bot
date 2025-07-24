@@ -19,11 +19,15 @@ on:
 jobs:
   ruff-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
@@ -61,4 +65,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add .
           git commit -m "Auto-fix: Apply ruff formatting and linting fixes"
-          git push
+          git push origin ${{ github.head_ref || github.ref_name }}
