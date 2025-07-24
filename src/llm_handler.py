@@ -1,7 +1,8 @@
-import os
 import logging
-from langchain_core.prompts import ChatPromptTemplate
+import os
+
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Configure logging
@@ -43,10 +44,12 @@ def get_llm_response(user_message: str) -> str | None:
     try:
         # Initialize the LangChain chat model with the specific Gemini model
         llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
+            model="gemini-2.0-flash",
             google_api_key=os.environ.get("GOOGLE_API_KEY"),
             temperature=0.7,
-            convert_system_message_to_human=True # Important for models that prefer human/user roles
+            max_tokens=None,
+            timeout=None,
+            max_retries=2
         )
 
         # Create the prompt template

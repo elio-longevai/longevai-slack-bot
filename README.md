@@ -12,7 +12,7 @@ Qualivita Assistant is an intelligent bot integrated into Slack to boost team pr
 
 ## Tech Stack
 
--   Python 3.9+
+-   Python 3.13+
 -   [slack-bolt](https://slack.dev/bolt-python/): For robust Slack integration.
 -   [LangChain](https://www.langchain.com/): For orchestrating the LLM interaction.
 -   [Google Gemini](https://ai.google.dev/): The language model powering the bot's intelligence.
@@ -23,19 +23,50 @@ Qualivita Assistant is an intelligent bot integrated into Slack to boost team pr
 
 -   A Slack Workspace where you have permission to add apps.
 -   A Google AI API Key.
--   Python 3.9 or higher.
+-   Python 3.13 or higher.
 
 ### 2. Create a Slack App
 
-Follow the [official Slack guide](https://api.slack.com/authentication/basics) to create a new Slack App. During setup, you will need to:
+Here's a step-by-step guide to setting up your Slack app:
 
-1.  **Enable Socket Mode**: In your app's settings, go to "Socket Mode" and enable it. Generate an App-Level Token (starts with `xapp-`).
-2.  **Add Bot Scopes**: Go to "OAuth & Permissions" and add the following **Bot Token Scopes**:
-    -   `chat:write` (to send messages)
-    -   `channels:history` (to read messages in public channels)
-    -   `groups:history` (to read messages in private channels)
-3.  **Install to Workspace**: Install the app to your workspace. This will generate a Bot User OAuth Token (starts with `xoxb-`).
-4.  **Add Bot to a Channel**: In your Slack client, go to the desired channel and use `/add` to add your newly created bot.
+#### Step 1: Create the App
+1. Go to [Your Apps](https://api.slack.com/apps) page on Slack
+2. Click **"Create New App"**
+3. Select **"From scratch"**
+4. Enter app name: `Qualivita Assistant`
+5. Select your workspace and click **"Create App"**
+
+#### Step 2: Configure Bot Permissions
+1. In your app settings, go to **"OAuth & Permissions"**
+2. Scroll to **"Bot Token Scopes"** and add these scopes:
+   - `chat:write` (to send messages)
+   - `channels:history` (to read messages in public channels)
+   - `groups:history` (to read messages in private channels)
+
+#### Step 3: Enable Socket Mode
+1. Go to **"Socket Mode"** in your app settings
+2. Toggle **"Enable Socket Mode"** to ON
+3. Go to **"Basic Information"** → **"App-Level Tokens"**
+4. Click **"Generate Token and Scopes"**
+5. Token Name: `socket-mode-token`
+6. Add scope: `connections:write`
+7. Click **"Generate"** and copy the **App-Level Token** (starts with `xapp-`)
+
+#### Step 4: Install and Get Bot Token
+1. Go to **"OAuth & Permissions"**
+2. Click **"Install to Workspace"**
+3. Review permissions and click **"Allow"**
+4. Copy the **Bot User OAuth Token** (starts with `xoxb-`)
+
+#### Step 5: Add Bot to Channel
+1. In your Slack workspace, go to the channel where you want the bot
+2. Type `/invite @Qualivita Assistant` (or use the name you chose)
+3. The bot will now listen to messages in that channel
+
+#### Step 6: Get Google AI API Key
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Click **"Create API Key"**
+3. Copy your API key for the `.env` file
 
 ### 3. Configure a Local Environment
 
@@ -45,36 +76,68 @@ Follow the [official Slack guide](https://api.slack.com/authentication/basics) t
     cd qualivita-slack-bot
     ```
 
-2.  **Set up a virtual environment (recommended):**
+2.  **Setup and install dependencies:**
     ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    make setup
     ```
+    This will create a virtual environment, install all dependencies, and set up git hooks.
 
-3.  **Install dependencies:**
+3.  **Create your environment file:**
     ```bash
-    pip install -r requirements.txt
+    cp .env.example .env
     ```
-
-4.  **Create your environment file:**
-    -   Copy the example file: `cp .env.example .env`
-    -   Open the `.env` file and fill in your secret keys:
-        -   `SLACK_BOT_TOKEN` (the `xoxb-` token)
-        -   `SLACK_APP_TOKEN` (the `xapp-` token)
-        -   `GOOGLE_API_KEY` (your key from Google AI Studio)
+    Then edit `.env` and add your tokens:
+    ```bash
+    SLACK_BOT_TOKEN="xoxb-your-bot-token-here"
+    SLACK_APP_TOKEN="xapp-your-app-token-here"  
+    GOOGLE_API_KEY="your-google-api-key-here"
+    ```
 
 ## Running the Bot
 
-With your virtual environment activated and your `.env` file configured, simply run the bot:
+Start the bot with:
 
 ```bash
-python -m src.bot
+make dev
 ```
 
 You should see the log message `🤖 Qualivita Assistant is running!`. Now, go to the Slack channel where you added the bot and start sending messages!
+
+## Development Commands
+
+This project uses a Makefile for common tasks:
+
+- `make setup` - Initial setup (clean, install deps, git hooks)
+- `make dev` - Start the bot
+- `make lint` - Check code quality with ruff
+- `make format` - Auto-format code with ruff
+- `make compile-requirements` - Update requirements.txt from requirements.in
+- `make clean` - Clean build artifacts and cache
+- `make health` - Check system health and dependencies
+- `make help` - Show all available commands
+
+## Testing the Bot
 
 **Example Messages to Try:**
 
 -   `hey ai, what are the best practices for a REST API design?`
 -   `I need to add a new task for the Q3 report to the project board`
 -   (Send a normal message like "hello everyone" to see that the bot correctly ignores it)
+
+## Project Structure
+
+```
+qualivita-slack-bot/
+├── .env.example              # Environment variables template
+├── .github/workflows/        # GitHub Actions for CI/CD
+├── Makefile                  # Development commands
+├── README.md                 # This file
+├── requirements.in           # Core dependencies
+├── requirements-dev.in       # Development dependencies  
+├── requirements.txt          # Compiled dependencies
+├── requirements-dev.txt      # Compiled dev dependencies
+└── src/
+    ├── __init__.py          # Package marker
+    ├── bot.py               # Main Slack bot application
+    └── llm_handler.py       # Google Gemini LLM integration
+```

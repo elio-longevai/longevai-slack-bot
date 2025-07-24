@@ -1,0 +1,64 @@
+name: Ruff Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.py'
+      - 'requirements*.txt'
+      - 'requirements*.in'
+      - '.github/workflows/ruff-lint.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.py'
+      - 'requirements*.txt'
+      - 'requirements*.in'
+      - '.github/workflows/ruff-lint.yml'
+
+jobs:
+  ruff-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -r requirements-dev.txt
+
+      - name: Run ruff format
+        run: |
+          ruff format .
+
+      - name: Run ruff check with auto-fix
+        run: |
+          ruff check . --fix
+
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Auto-fix: Apply ruff formatting and linting fixes"
+          git push

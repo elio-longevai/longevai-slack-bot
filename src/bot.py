@@ -1,8 +1,10 @@
-import os
 import logging
+import os
+
 from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
+
 from src.llm_handler import get_llm_response
 
 # --- Setup ---
